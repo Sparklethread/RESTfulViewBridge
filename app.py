@@ -24,28 +24,35 @@ def verify_password(username, password):
 class Order(db.Model):
     __tablename__ = 'Order'
     __table_args__ = {'autoload':True, 'autoload_with':db.engine, 'extend_existing':True}
-    # Define the columns based on your Order view structure
-    # ...
+    OrderID = db.Column(db.Integer, primary_key=True)
+    CustomerID = db.Column(db.Integer)
+    OrderDate = db.Column(db.DateTime)
+    TotalAmount = db.Column(db.Float)
 
 class Customer(db.Model):
     __tablename__ = 'Customer'
     __table_args__ = {'autoload':True, 'autoload_with':db.engine, 'extend_existing':True}
-    # Define the columns based on your Customer view structure
-    # ...
+    CustomerID = db.Column(db.Integer, primary_key=True)
+    FirstName = db.Column(db.String(50))
+    LastName = db.Column(db.String(50))
+    Email = db.Column(db.String(120))
+    Phone = db.Column(db.String(20))
 
 class Invoice(db.Model):
     __tablename__ = 'Invoice'
     __table_args__ = {'autoload':True, 'autoload_with':db.engine, 'extend_existing':True}
-    # Define the columns based on your Invoice view structure
-    # ...
+    InvoiceID = db.Column(db.Integer, primary_key=True)
+    OrderID = db.Column(db.Integer)
+    InvoiceDate = db.Column(db.DateTime)
+    TotalAmount = db.Column(db.Float)
+    PaymentStatus = db.Column(db.String(20))
 
 @app.route('/Order', methods=['GET'])
 @auth.login_required
 def get_order():
     try:
         records = Order.query.all()
-        # Modify the jsonify part based on your Order view structure
-        return jsonify([record.some_field for record in records])
+        return jsonify([{ 'OrderID': record.OrderID, 'CustomerID': record.CustomerID, 'OrderDate': record.OrderDate, 'TotalAmount': record.TotalAmount } for record in records])
     except Exception as e:
         abort(500, description="Internal Server Error. Error: " + str(e))
 
@@ -54,8 +61,7 @@ def get_order():
 def get_customer():
     try:
         records = Customer.query.all()
-        # Modify the jsonify part based on your Customer view structure
-        return jsonify([record.some_field for record in records])
+        return jsonify([{ 'CustomerID': record.CustomerID, 'FirstName': record.FirstName, 'LastName': record.LastName, 'Email': record.Email, 'Phone': record.Phone } for record in records])
     except Exception as e:
         abort(500, description="Internal Server Error. Error: " + str(e))
 
@@ -64,8 +70,7 @@ def get_customer():
 def get_invoice():
     try:
         records = Invoice.query.all()
-        # Modify the jsonify part based on your Invoice view structure
-        return jsonify([record.some_field for record in records])
+        return jsonify([{ 'InvoiceID': record.InvoiceID, 'OrderID': record.OrderID, 'InvoiceDate': record.InvoiceDate, 'TotalAmount': record.TotalAmount, 'PaymentStatus': record.PaymentStatus } for record in records])
     except Exception as e:
         abort(500, description="Internal Server Error. Error: " + str(e))
 
